@@ -11,6 +11,7 @@ import (
 type PortalsRenderer struct {
 	io                 *backend.RaylibBackend
 	screenW, screenH   int
+	aspectRatio        float64
 	minimapW, minimapH int
 	minimapScale       float64
 
