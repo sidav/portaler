@@ -7,7 +7,6 @@ func (r *PortalsRenderer) drawWallAsOnScreenTrapezoid(wall, fitIn *trapezoid, as
 	if fitIn.x2 < fitIn.x1 {
 		panic("Inverted trapezoid!")
 	}
-	// fmt.Printf("Drawing: %s", wall.getInfoString())
 
 	for x := wall.x1; x <= wall.x2; x++ {
 		// horizontal clipping
@@ -52,7 +51,6 @@ func (r *PortalsRenderer) drawFloorUnderOnscreenTrapezoid(wall, fitIn *trapezoid
 	if wall.x2 < wall.x1 {
 		panic("Inverted trapezoid!")
 	}
-	// fmt.Printf("Drawing: %s", wall.getInfoString())
 
 	for x := wall.x1; x <= wall.x2; x++ {
 		// horizontal clipping

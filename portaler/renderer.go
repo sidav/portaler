@@ -16,7 +16,9 @@ type PortalsRenderer struct {
 	minimapScale       float64
 
 	totalTimeForRendering time.Duration
-	totalFrames           int
+	meanRenderingTime     time.Duration
+	meanTimeEachFrames    int
+	totalFramesRendered   int
 
 	scene                *Scene
 	renderedSectorsTable []bool // TODO: get rid of it somehow
@@ -39,14 +41,20 @@ func (r *PortalsRenderer) Render(s *Scene, c *camera) {
 	r.io.BeginFrame()
 	rl.ClearBackground(rl.Black)
 
+	debugPrintf("======= BEGIN FRAME %d =======\n", r.totalFramesRendered+1)
+
 	t := time.Now()
 
 	r.renderScene(s, c)
 
-	r.totalFrames++
+	r.totalFramesRendered++
 	r.totalTimeForRendering += time.Since(t)
 	debugPrintf("FRAME ENDED. Passed %8v\n", time.Since(t))
-	rl.DrawText(fmt.Sprintf("Mean frame time %-8s", r.totalTimeForRendering/time.Duration(r.totalFrames)), int32(r.minimapW)+2, 0, 21, rl.White)
+	if r.totalFramesRendered%r.meanTimeEachFrames == 0 {
+		r.meanRenderingTime = r.totalTimeForRendering / time.Duration(r.meanTimeEachFrames)
+		r.totalTimeForRendering = 0
+	}
+	rl.DrawText(fmt.Sprintf("Mean frame time %-8s", r.meanRenderingTime), int32(r.minimapW)+2, 0, 21, rl.White)
 	rl.DrawText(c.GetInfo(), 0, int32(r.screenH-32), 30, rl.Blue)
 
 	r.io.EndFrame()
@@ -55,15 +63,17 @@ func (r *PortalsRenderer) Render(s *Scene, c *camera) {
 
 func (r *PortalsRenderer) renderScene(s *Scene, c *camera) {
 	r.resetRenderedSectorsTable()
-	screenArea := newTrapezoid(0, r.screenH-1, 0, r.screenW-1, r.screenH, 0) // represents whole screen
+	screenArea := newTrapezoid(0, r.screenH-1, 0, r.screenW-1, r.screenH-1, 0) // represents whole screen
 	x, y := c.GetDirectionVector()
 	x *= c.distToScreenPlane * 2.0 / 3.0
 	y *= c.distToScreenPlane * 2.0 / 3.0
 	sectorWithCameraPlaneIn := s.FindSectorWithCoordinates(c.x+x, c.y+y)
 	if sectorWithCameraPlaneIn != nil {
+		debugPrintf("Camera sector %d\n", sectorWithCameraPlaneIn.id)
 		r.renderSector(sectorWithCameraPlaneIn, c, screenArea)
 	} else {
 		// do not crash
+		debugPrintf("Camera not found in any sector\n")
 		r.renderSector(s.sectors[0], c, screenArea)
 	}
 	r.drawMinimap(s, c)
@@ -80,6 +90,7 @@ nextLinedef:
 				debugPrintf("S%d portal to S%d skipped, ", currentSector.id, l.getNextSectorFrom(currentSector).id)
 				continue nextLinedef
 			}
+			debugPrintf("S%d portal rendering, ", currentSector.id)
 			r.renderPortalLinedef(l, currentSector, c, screenArea)
 		} else {
 			debugPrintf("S%d line rendered, ", currentSector.id)

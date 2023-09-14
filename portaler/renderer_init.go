@@ -4,10 +4,11 @@ import "portalrenderer/backend"
 
 func NewRenderer(b backend.RendererBackend, screenW, screenH int, sc *Scene) *PortalsRenderer {
 	r := &PortalsRenderer{
-		io:          b.(*backend.RaylibBackend),
-		screenW:     screenW,
-		screenH:     screenH,
-		aspectRatio: float64(screenW) / float64(screenH),
+		io:                 b.(*backend.RaylibBackend),
+		screenW:            screenW,
+		screenH:            screenH,
+		aspectRatio:        float64(screenW) / float64(screenH),
+		meanTimeEachFrames: 30,
 	}
 	r.minimapH = r.screenH / 4
 	r.minimapW = r.minimapH
