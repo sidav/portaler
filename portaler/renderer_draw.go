@@ -1,6 +1,14 @@
 package portaler
 
-func (r *PortalsRenderer) drawWallAsOnScreenTrapezoid(wall, fitIn *trapezoid, asOutline bool) {
+type wallTypeCode uint8
+
+const (
+	wallTypeLower wallTypeCode = iota
+	wallTypeUpper
+	wallTypeFull
+)
+
+func (r *PortalsRenderer) drawWallAsOnScreenTrapezoid(wall, fitIn *trapezoid, asOutline bool, wallType wallTypeCode) {
 	if wall.x2 < wall.x1 {
 		panic("Inverted trapezoid!")
 	}
@@ -16,9 +24,21 @@ func (r *PortalsRenderer) drawWallAsOnScreenTrapezoid(wall, fitIn *trapezoid, as
 		if x > fitIn.x2 {
 			return
 		}
+		if x < 0 {
+			x = 0
+		}
+		if x >= r.screenW {
+			return
+		}
+		if r.filledColumnsTable[x] {
+			continue
+		}
+		if wallType == wallTypeFull {
+			r.filledColumnsTable[x] = true
+		}
 		currLower, currUpper := wall.getLowerAndUpperYCoordAtX(x)
 		// vertical clipping
-		clipLower, clipUpper := fitIn.getLowerAndUpperYCoordAtX(x)
+		clipLower, clipUpper := r.renderedColumnsTable[x][0], r.renderedColumnsTable[x][1] // fitIn.getLowerAndUpperYCoordAtX(x)
 		if currLower > clipLower && currUpper > clipLower {
 			continue
 		}
@@ -32,6 +52,13 @@ func (r *PortalsRenderer) drawWallAsOnScreenTrapezoid(wall, fitIn *trapezoid, as
 			currUpper = clipUpper
 		}
 
+		if wallType != wallTypeUpper {
+			r.renderedColumnsTable[x][0] = currUpper
+		}
+		if wallType != wallTypeLower {
+			r.renderedColumnsTable[x][1] = currLower
+		}
+
 		// the drawing itself:
 		if asOutline {
 			if x == wall.x1 || x == wall.x2 {
@@ -40,6 +67,7 @@ func (r *PortalsRenderer) drawWallAsOnScreenTrapezoid(wall, fitIn *trapezoid, as
 			r.io.DrawPoint(int32(x), int32(currLower))
 			r.io.DrawPoint(int32(x), int32(currUpper))
 		} else {
+			r.debugFlush()
 			r.io.VerticalLine(x, currUpper, currLower)
 		}
 	}
@@ -60,17 +88,22 @@ func (r *PortalsRenderer) drawFloorUnderOnscreenTrapezoid(wall, fitIn *trapezoid
 		if x > fitIn.x2 {
 			return
 		}
+		if x < 0 {
+			x = 0
+		}
+		if x >= r.screenW {
+			return
+		}
 		topY, _ := wall.getLowerAndUpperYCoordAtX(x)
 		// vertical clipping
-		bottomY, highestAllowedY := fitIn.getLowerAndUpperYCoordAtX(x)
+		bottomY := r.renderedColumnsTable[x][0]
 		if topY > bottomY {
 			continue
 		}
-		if topY < highestAllowedY {
-			bottomY = highestAllowedY
-		}
 		// the drawing itself:
 		r.io.VerticalLine(x, topY, bottomY)
+		r.debugFlush()
+		r.renderedColumnsTable[x][0] = topY
 	}
 }
 
@@ -86,16 +119,20 @@ func (r *PortalsRenderer) drawCeilingOverOnscreenTrapezoid(wall, fitIn *trapezoi
 		if x > fitIn.x2 {
 			return
 		}
+		if x < 0 {
+			x = 0
+		}
+		if x >= r.screenW {
+			return
+		}
 		_, bottomY := wall.getLowerAndUpperYCoordAtX(x)
 		// vertical clipping
-		lowestAllowedY, topY := fitIn.getLowerAndUpperYCoordAtX(x)
-		if bottomY < topY {
+		topY := r.renderedColumnsTable[x][1]
+		if topY > bottomY {
 			continue
-		}
-		if bottomY > lowestAllowedY {
-			bottomY = lowestAllowedY
 		}
 		// the drawing itself:
 		r.io.VerticalLine(x, topY, bottomY)
+		r.renderedColumnsTable[x][1] = bottomY
 	}
 }

@@ -25,6 +25,14 @@ func debugPrintf(msg string, args ...interface{}) {
 	fmt.Printf(msg, args...)
 }
 
+func (r *PortalsRenderer) debugFlush() {
+	if r.debugOn {
+		r.io.EndFrame()
+		r.io.Flush()
+		r.io.BeginFrame()
+	}
+}
+
 func debugPrintOnScreen(x, y int, msg string, args ...interface{}) {
 	if time.Now().Second()%2 == 0 {
 		rl.DrawText(fmt.Sprintf(msg, args...), int32(x), int32(y), 16, rl.Black)
