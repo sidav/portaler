@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"portalrenderer/backend"
 	"portalrenderer/portaler"
+	"time"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -68,6 +69,12 @@ func main() {
 		if rl.IsKeyDown(rl.KeyZ) {
 			cam.Height -= 0.025
 			fmt.Printf("CamH is now %.2f\n", cam.Height)
+		}
+		if rl.IsKeyDown(rl.KeyDelete) {
+			renderer.DebugOn = !renderer.DebugOn
+			if !renderer.DebugOn {
+				time.Sleep(500 * time.Millisecond)
+			}
 		}
 	}
 	defer rl.CloseWindow()

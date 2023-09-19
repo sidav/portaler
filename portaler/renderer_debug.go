@@ -26,7 +26,7 @@ func debugPrintf(msg string, args ...interface{}) {
 }
 
 func (r *PortalsRenderer) debugFlush() {
-	if r.debugOn {
+	if r.DebugOn {
 		r.io.EndFrame()
 		r.io.Flush()
 		r.io.BeginFrame()

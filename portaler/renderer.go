@@ -25,7 +25,7 @@ type PortalsRenderer struct {
 	renderedColumnsTable [][2]int // first - bottom-to-top (lower) rendered coord, second - top-to-bottom (upper)
 	filledColumnsTable   []bool   // true if column can not be drawn into
 
-	debugOn bool
+	DebugOn bool
 }
 
 func (r *PortalsRenderer) wasSectorRendered(s *sector) bool {
@@ -99,19 +99,23 @@ func (r *PortalsRenderer) renderScene(s *Scene, c *camera) {
 func (r *PortalsRenderer) renderSector(currentSector *sector, c *camera, screenArea *trapezoid) {
 	debugPrintf("Rendering sector #%d: ", currentSector.id)
 	r.renderedSectorsTable[currentSector.id] = true
-nextLinedef:
+	// render non-portals first
+	for _, l := range currentSector.lines {
+		if !l.isPortal {
+			debugPrintf("S%d line rendered, ", currentSector.id)
+			r.renderLinedef(l, currentSector, c, screenArea)
+		}
+	}
+	// render portals only
 	for _, l := range currentSector.lines {
 		if l.isPortal {
 			// skip if the sector was already rendered
 			if r.wasSectorRendered(l.getNextSectorFrom(currentSector)) {
 				debugPrintf("S%d portal to S%d skipped, ", currentSector.id, l.getNextSectorFrom(currentSector).id)
-				continue nextLinedef
+				continue
 			}
 			debugPrintf("S%d portal rendering, ", currentSector.id)
 			r.renderPortalLinedef(l, currentSector, c, screenArea)
-		} else {
-			debugPrintf("S%d line rendered, ", currentSector.id)
-			r.renderLinedef(l, currentSector, c, screenArea)
 		}
 	}
 	debugPrintf("\nSector #%d rendered.\n", currentSector.id)
