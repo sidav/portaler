@@ -20,10 +20,9 @@ type PortalsRenderer struct {
 	meanTimeEachFrames    int
 	totalFramesRendered   int
 
-	scene                *Scene
-	renderedSectorsTable []bool   // TODO: get rid of it somehow
-	renderedColumnsTable [][2]int // first - bottom-to-top (lower) rendered coord, second - top-to-bottom (upper)
-	filledColumnsTable   []bool   // true if column can not be drawn into
+	scene                 *Scene
+	renderedSectorsTable  []bool // TODO: get rid of it somehow
+	renderedColumnsBuffer columnsBuffer
 
 	DebugOn bool
 }
@@ -42,18 +41,9 @@ func (r *PortalsRenderer) Render(s *Scene, c *camera) {
 	if rl.IsWindowResized() {
 		r.io.SetInternalResolution(int32(rl.GetScreenWidth()), int32(rl.GetScreenHeight()))
 	}
-	if len(r.renderedColumnsTable) != r.screenW {
-		r.renderedColumnsTable = make([][2]int, r.screenW)
-		r.filledColumnsTable = make([]bool, r.screenW)
-	}
+	r.renderedColumnsBuffer.reinitForWidth(r.screenW)
 	// reset columns table
-	for x := range r.renderedColumnsTable {
-		r.renderedColumnsTable[x][0] = r.screenH
-		r.renderedColumnsTable[x][1] = 0
-	}
-	for x := range r.filledColumnsTable {
-		r.filledColumnsTable[x] = false
-	}
+	r.renderedColumnsBuffer.clear(r.screenH)
 
 	r.io.BeginFrame()
 	rl.ClearBackground(rl.Black)

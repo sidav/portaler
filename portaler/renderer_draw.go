@@ -30,15 +30,12 @@ func (r *PortalsRenderer) drawWallAsOnScreenTrapezoid(wall, fitIn *trapezoid, as
 		if x >= r.screenW {
 			return
 		}
-		if r.filledColumnsTable[x] {
+		if r.renderedColumnsBuffer.isColumnFull(x) {
 			continue
-		}
-		if wallType == wallTypeFull {
-			r.filledColumnsTable[x] = true
 		}
 		currLower, currUpper := wall.getLowerAndUpperYCoordAtX(x)
 		// vertical clipping
-		clipLower, clipUpper := r.renderedColumnsTable[x][0], r.renderedColumnsTable[x][1] // fitIn.getLowerAndUpperYCoordAtX(x)
+		clipLower, clipUpper := r.renderedColumnsBuffer.getLowerAndUpperAt(x) // fitIn.getLowerAndUpperYCoordAtX(x)
 		if currLower > clipLower && currUpper > clipLower {
 			continue
 		}
@@ -53,10 +50,10 @@ func (r *PortalsRenderer) drawWallAsOnScreenTrapezoid(wall, fitIn *trapezoid, as
 		}
 
 		if wallType != wallTypeUpper {
-			r.renderedColumnsTable[x][0] = currUpper
+			r.renderedColumnsBuffer.setNewLowerAt(currUpper, x)
 		}
 		if wallType != wallTypeLower {
-			r.renderedColumnsTable[x][1] = currLower
+			r.renderedColumnsBuffer.setNewUpperAt(currLower, x)
 		}
 
 		// the drawing itself:
@@ -96,17 +93,17 @@ func (r *PortalsRenderer) drawFloorUnderOnscreenTrapezoid(wall, fitIn *trapezoid
 		}
 		topY, _ := wall.getLowerAndUpperYCoordAtX(x)
 		// vertical clipping
-		if topY < r.renderedColumnsTable[x][1] {
-			topY = r.renderedColumnsTable[x][1]
+		if topY < r.renderedColumnsBuffer.getUpperAt(x) {
+			topY = r.renderedColumnsBuffer.getUpperAt(x)
 		}
-		bottomY := r.renderedColumnsTable[x][0]
+		bottomY := r.renderedColumnsBuffer.getLowerAt(x)
 		if topY > bottomY {
 			continue
 		}
 		// the drawing itself:
 		r.io.VerticalLine(x, topY, bottomY)
 		r.debugFlush()
-		r.renderedColumnsTable[x][0] = topY
+		r.renderedColumnsBuffer.setNewLowerAt(topY, x)
 	}
 }
 
@@ -130,15 +127,15 @@ func (r *PortalsRenderer) drawCeilingOverOnscreenTrapezoid(wall, fitIn *trapezoi
 		}
 		_, bottomY := wall.getLowerAndUpperYCoordAtX(x)
 		// vertical clipping
-		if bottomY > r.renderedColumnsTable[x][0] {
-			bottomY = r.renderedColumnsTable[x][0]
+		if bottomY > r.renderedColumnsBuffer.getLowerAt(x) {
+			bottomY = r.renderedColumnsBuffer.getLowerAt(x)
 		}
-		topY := r.renderedColumnsTable[x][1]
+		topY := r.renderedColumnsBuffer.getUpperAt(x)
 		if topY > bottomY {
 			continue
 		}
 		// the drawing itself:
 		r.io.VerticalLine(x, topY, bottomY)
-		r.renderedColumnsTable[x][1] = bottomY
+		r.renderedColumnsBuffer.setNewUpperAt(bottomY, x)
 	}
 }
