@@ -1,6 +1,7 @@
 package portaler
 
 func (r *PortalsRenderer) getLowerAndUpperScreenYForTransformedVertex(x, y, lowerHeight, upperHeight float64, c *camera) (int, int) {
+	// 0.5 here means "half of the screen"
 	// It should be 0.5 PLUS, but screen Y coordinates go down, so we need to invert
 	lower := 0.5 - r.aspectRatio*c.distToScreenPlane*(lowerHeight-c.Height)/x
 	upper := 0.5 - r.aspectRatio*c.distToScreenPlane*(upperHeight-c.Height)/x
@@ -9,6 +10,7 @@ func (r *PortalsRenderer) getLowerAndUpperScreenYForTransformedVertex(x, y, lowe
 
 func (r *PortalsRenderer) transformPointToScreenXCoord(x, y float64, c *camera) float64 {
 	// angle := math.Atan2(y, x)
+	// 0.5 here means "half of the screen"
 	res := 0.5 + c.distToScreenPlane*y/x // *math.Tan(angle)
 	return res
 }

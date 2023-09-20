@@ -27,3 +27,13 @@ func getLineIntersection(l1x1, l1y1, l1x2, l1y2, l2x1, l2y1, l2x2, l2y2 float64)
 
 	return false, 0, 0 // No collision
 }
+
+func isVectorClockwiseToZero(x1, y1, x2, y2 float64) bool {
+	// 	1)  create the vectors u = (b-a) = (b.x-a.x,b.y-a.y) and v = (c-b) ...
+	// vector u is simply (x1,y1), as we're comparing to zero
+	vx, vy := x2-x1, y2-y1
+	//  2) calculate the cross product uxv = u.x*v.y-u.y*v.x (only the last component is enough)
+	crossProduct := x1*vy - y1*vx
+	//  3) if uxv is -ve then a-b-c is curving in clockwise direction (and vice-versa).
+	return crossProduct < 0
+}

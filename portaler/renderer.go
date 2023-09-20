@@ -40,6 +40,8 @@ func (r *PortalsRenderer) resetRenderedSectorsTable() {
 func (r *PortalsRenderer) Render(s *Scene, c *camera) {
 	if rl.IsWindowResized() {
 		r.io.SetInternalResolution(int32(rl.GetScreenWidth()), int32(rl.GetScreenHeight()))
+		r.screenW = rl.GetScreenWidth()
+		r.screenH = rl.GetScreenHeight()
 	}
 	r.renderedColumnsBuffer.reinitForWidth(r.screenW)
 	// reset columns table

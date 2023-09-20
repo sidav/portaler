@@ -12,7 +12,7 @@ func NewRenderer(b backend.RendererBackend, screenW, screenH int, sc *Scene) *Po
 	}
 	r.minimapH = r.screenH / 4
 	r.minimapW = r.minimapH
-	r.minimapScale = float64(r.minimapH) / 32
+	r.minimapScale = float64(r.minimapH) / 16
 	r.setToScene(sc)
 	return r
 }

@@ -21,7 +21,13 @@ func NewCamera() *camera {
 }
 
 func (c *camera) Rotate(r float64) {
+	const twoPi = 3.1415926 * 2
 	c.radians += r
+	if c.radians < 0 {
+		c.radians += twoPi
+	} else if c.radians > twoPi {
+		c.radians -= twoPi
+	}
 	c.sin = math.Sin(c.radians)
 	c.cos = math.Cos(c.radians)
 }
@@ -55,4 +61,13 @@ func (c *camera) transformLinedefToCameraSpace(l *linedef) (x1, y1, x2, y2 float
 	x1, y1 = c.transformPointToCameraSpace(l.x1, l.y1)
 	x2, y2 = c.transformPointToCameraSpace(l.x2, l.y2)
 	return
+}
+
+func (c *camera) isPointInViewAngle(x, y float64) bool {
+	// Useful for transformed points only (assumes that camera looks along vector (1,0) always)
+	if x < 0 {
+		return false
+	}
+	pointAngle := math.Atan2(y, x)
+	return pointAngle < math.Atan2(1, c.distToScreenPlane)
 }

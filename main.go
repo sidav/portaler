@@ -22,7 +22,7 @@ func main() {
 
 	cam := portaler.NewCamera()
 	scene := &portaler.Scene{}
-	scene.InitTesting()
+	scene.InitTesting2()
 
 	renderer := portaler.NewRenderer(io, sw/pixelSize, sh/pixelSize, scene)
 

@@ -25,6 +25,10 @@ func debugPrintf(msg string, args ...interface{}) {
 	fmt.Printf(msg, args...)
 }
 
+func debugPanic(msg string, args ...interface{}) {
+	panic(fmt.Sprintf(msg, args...))
+}
+
 func (r *PortalsRenderer) debugFlush() {
 	if r.DebugOn {
 		r.io.EndFrame()
