@@ -15,10 +15,14 @@ func (r *PortalsRenderer) transformPointToScreenXCoord(x, y float64, c *camera) 
 
 func (r *PortalsRenderer) transformLinedefToScreenArea(l *linedef, floorH, ceilingH float64, c *camera, fitIn *trapezoid) (bool, *trapezoid) {
 	x1, y1, x2, y2 := c.transformLinedefToCameraSpace(l)
-	// clipping:
+	// Horizontal clipping against FOV:
 	if x1 < c.distToScreenPlane && x2 < c.distToScreenPlane {
+		if l.isPortal {
+			debugPrintf("PORTAL FULLY CLIPPED ")
+		}
 		return false, nil
 	}
+	// TODO: clip against FOV sector, not against a straight line
 	intersect, ix, iy := getLineIntersection(x1, y1, x2, y2, c.distToScreenPlane/8, 500, c.distToScreenPlane/8, -500)
 	if intersect {
 		if x1 < c.distToScreenPlane {
@@ -27,7 +31,7 @@ func (r *PortalsRenderer) transformLinedefToScreenArea(l *linedef, floorH, ceili
 			x2, y2 = ix, iy
 		}
 	}
-	// clipping ended
+	// FOV clipping ended
 
 	screenX1 := int(float64(r.screenW) * r.transformPointToScreenXCoord(x1, y1, c))
 	screenX2 := int(float64(r.screenW) * r.transformPointToScreenXCoord(x2, y2, c))
@@ -47,6 +51,7 @@ func (r *PortalsRenderer) transformLinedefToScreenArea(l *linedef, floorH, ceili
 		x2 = tf
 	}
 	// clip against the given screenArea
+	// Horizontal:
 	if screenX1 == screenX2 {
 		return false, nil
 	}
@@ -55,7 +60,10 @@ func (r *PortalsRenderer) transformLinedefToScreenArea(l *linedef, floorH, ceili
 	} else if screenX1 >= fitIn.x2 && screenX2 > fitIn.x2 {
 		return false, nil
 	}
-	// TODO: vertical clipping
+	// Vertical:
+	// TODO: It's needed for portals for sure, but maybe it's not needed for usual walls? It may make texturing harder
+
+	// fitIn clipping ended
 	ly1int, uy1int := r.getLowerAndUpperScreenYForTransformedVertex(x1, y1, floorH, ceilingH, c)
 	ly2int, uy2int := r.getLowerAndUpperScreenYForTransformedVertex(x2, y2, floorH, ceilingH, c)
 

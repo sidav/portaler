@@ -35,12 +35,12 @@ func (r *PortalsRenderer) drawWallAsOnScreenTrapezoid(wall, fitIn *trapezoid, as
 		// the drawing itself:
 		if asOutline {
 			if x == wall.x1 || x == wall.x2 {
-				r.io.VerticalLine(x, currLower, currUpper)
+				r.verticalLine(x, currLower, currUpper)
 			}
-			r.io.DrawPoint(int32(x), int32(currLower))
-			r.io.DrawPoint(int32(x), int32(currUpper))
+			r.drawPoint(x, currLower)
+			r.drawPoint(x, currUpper)
 		} else {
-			r.io.VerticalLine(x, currUpper, currLower)
+			r.verticalLine(x, currUpper, currLower)
 		}
 	}
 	// debugPrintOnScreen(fitIn.x1, (fitIn.y1high+fitIn.y1low)/2, "%+v", fitIn.getInfoString())
@@ -70,7 +70,7 @@ func (r *PortalsRenderer) drawFloorUnderOnscreenTrapezoid(wall, fitIn *trapezoid
 			bottomY = highestAllowedY
 		}
 		// the drawing itself:
-		r.io.VerticalLine(x, topY, bottomY)
+		r.verticalLine(x, topY, bottomY)
 	}
 }
 
@@ -96,6 +96,29 @@ func (r *PortalsRenderer) drawCeilingOverOnscreenTrapezoid(wall, fitIn *trapezoi
 			bottomY = lowestAllowedY
 		}
 		// the drawing itself:
-		r.io.VerticalLine(x, topY, bottomY)
+		r.verticalLine(x, topY, bottomY)
 	}
+}
+
+func (r *PortalsRenderer) drawPoint(x, y int) {
+	// if x < 0 || y < 0 || x >= r.screenW || y >= r.screenH {
+	// 	return
+	// }
+	// if r.renderedPixelsBuffer[x][y] == r.totalFramesRendered {
+	// 	return
+	// }
+	// r.renderedPixelsBuffer[x][y] = r.totalFramesRendered
+	r.io.DrawPoint(int32(x), int32(y))
+}
+
+func (r *PortalsRenderer) verticalLine(x, y1, y2 int) {
+	// if y1 > y2 {
+	// 	t := y1
+	// 	y1 = y2
+	// 	y2 = t
+	// }
+	// for y := y1; y < y2; y++ {
+	// 	r.drawPoint(x, y)
+	// }
+	r.io.VerticalLine(x, y1, y2)
 }

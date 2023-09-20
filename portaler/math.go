@@ -7,6 +7,13 @@ func min(a, b int) int {
 	return b
 }
 
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
 func areCoordsInRect(x, y, rx, ry, rw, rh int) bool {
 	return x >= rx && x < rx+rw && y >= ry && y < ry+rh
 }

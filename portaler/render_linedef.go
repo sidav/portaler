@@ -19,6 +19,11 @@ func (r *PortalsRenderer) renderPortalLinedef(l *linedef, s *sector, c *camera, 
 		return
 	}
 
+	fit := portalTrapezoid.fitInto(screenArea)
+	if !fit {
+		return
+	}
+
 	// needed for the "outsticking sector" bug workaround (see below)
 	initialPortalTrapezoid := *portalTrapezoid
 
