@@ -14,7 +14,7 @@ type RaylibBackend struct {
 func (rb *RaylibBackend) Init(w, h int32) {
 	rl.InitWindow(w, h, "RENDERER")
 	rl.SetWindowState(rl.FlagWindowResizable) // + rl.FlagWindowMaximized)
-	rl.SetTargetFPS(30)
+	rl.SetTargetFPS(45)
 	rl.SetExitKey(rl.KeyEscape)
 }
 

@@ -46,7 +46,7 @@ func (r *PortalsRenderer) transformLinedefToScreenArea(l *linedef, floorH, ceili
 		x1 = x2
 		x2 = tf
 	}
-	// clip against the given screenArea
+	// Cull against the given screenArea (horizontal only)
 	if screenX1 == screenX2 {
 		return false, nil
 	}
@@ -55,7 +55,7 @@ func (r *PortalsRenderer) transformLinedefToScreenArea(l *linedef, floorH, ceili
 	} else if screenX1 >= fitIn.x2 && screenX2 > fitIn.x2 {
 		return false, nil
 	}
-	// TODO: vertical clipping
+
 	ly1int, uy1int := r.getLowerAndUpperScreenYForTransformedVertex(x1, y1, floorH, ceilingH, c)
 	ly2int, uy2int := r.getLowerAndUpperScreenYForTransformedVertex(x2, y2, floorH, ceilingH, c)
 

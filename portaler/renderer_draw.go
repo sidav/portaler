@@ -96,6 +96,9 @@ func (r *PortalsRenderer) drawFloorUnderOnscreenTrapezoid(wall, fitIn *trapezoid
 		}
 		topY, _ := wall.getLowerAndUpperYCoordAtX(x)
 		// vertical clipping
+		if topY < r.renderedColumnsTable[x][1] {
+			topY = r.renderedColumnsTable[x][1]
+		}
 		bottomY := r.renderedColumnsTable[x][0]
 		if topY > bottomY {
 			continue
@@ -127,6 +130,9 @@ func (r *PortalsRenderer) drawCeilingOverOnscreenTrapezoid(wall, fitIn *trapezoi
 		}
 		_, bottomY := wall.getLowerAndUpperYCoordAtX(x)
 		// vertical clipping
+		if bottomY > r.renderedColumnsTable[x][0] {
+			bottomY = r.renderedColumnsTable[x][0]
+		}
 		topY := r.renderedColumnsTable[x][1]
 		if topY > bottomY {
 			continue
