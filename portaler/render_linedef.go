@@ -14,8 +14,14 @@ func (r *PortalsRenderer) renderLinedef(l *linedef, s *sector, c *camera, screen
 }
 
 func (r *PortalsRenderer) renderPortalLinedef(l *linedef, s *sector, c *camera, screenArea *trapezoid) {
-	transformed, portalTrapezoid := r.transformLinedefToScreenArea(l, s.floorHeight, s.ceilingHeight, c, screenArea)
-	if !transformed {
+	transformedWall, portalAsWallTrapezoid := r.transformLinedefToScreenArea(l, s.floorHeight, s.ceilingHeight, c, screenArea)
+	transformedPortal, portalTrapezoid := r.transformPortalToScreenArea(l, s.floorHeight, s.ceilingHeight, c, screenArea)
+	if !transformedWall && transformedPortal {
+		r.renderSector(l.getNextSectorFrom(s), c, portalTrapezoid)
+		return
+	}
+	// TODO: investigate if it's needed, or if it should be called earlier.
+	if !transformedPortal {
 		return
 	}
 
@@ -36,9 +42,9 @@ func (r *PortalsRenderer) renderPortalLinedef(l *linedef, s *sector, c *camera, 
 	// r.drawWallAsOnScreenTrapezoid(portalTrapezoid, screenArea, true)
 
 	r.setColorWithBrightness(100, 32, 0, s.lightLevel)
-	r.drawFloorUnderOnscreenTrapezoid(portalTrapezoid, screenArea)
+	r.drawFloorUnderOnscreenTrapezoid(portalAsWallTrapezoid, screenArea)
 	r.setColorWithBrightness(64, 32, 64, s.lightLevel)
-	r.drawCeilingOverOnscreenTrapezoid(portalTrapezoid, screenArea)
+	r.drawCeilingOverOnscreenTrapezoid(portalAsWallTrapezoid, screenArea)
 	r.setColorWithBrightness(l.r, l.g, l.b, s.lightLevel)
 	if upperWallTrapezoid != nil {
 		r.drawWallAsOnScreenTrapezoid(upperWallTrapezoid, screenArea, false, wallTypeUpper)

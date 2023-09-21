@@ -73,10 +73,7 @@ func (r *PortalsRenderer) Render(s *Scene, c *camera) {
 func (r *PortalsRenderer) renderScene(s *Scene, c *camera) {
 	r.resetRenderedSectorsTable()
 	screenArea := newTrapezoid(0, r.screenH-1, 0, r.screenW-1, r.screenH-1, 0) // represents whole screen
-	x, y := c.GetDirectionVector()
-	x *= c.distToScreenPlane * 2.0 / 3.0
-	y *= c.distToScreenPlane * 2.0 / 3.0
-	sectorWithCameraPlaneIn := s.FindSectorWithCoordinates(c.x+x, c.y+y)
+	sectorWithCameraPlaneIn := s.FindSectorWithCoordinates(c.x, c.y)
 	if sectorWithCameraPlaneIn != nil {
 		debugPrintf("Camera sector %d\n", sectorWithCameraPlaneIn.id)
 		r.renderSector(sectorWithCameraPlaneIn, c, screenArea)

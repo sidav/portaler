@@ -15,9 +15,23 @@ func (r *PortalsRenderer) transformPointToScreenXCoord(x, y float64, c *camera) 
 	return res
 }
 
+func (r *PortalsRenderer) transformPortalToScreenArea(l *linedef, floorH, ceilingH float64, c *camera, fitIn *trapezoid) (bool, *trapezoid) {
+	x1, _, x2, _ := c.transformLinedefToCameraSpace(l)
+	// culling:
+	if x1 < c.distToScreenPlane || x2 < c.distToScreenPlane {
+		if x1 > 0 || x2 > 0 {
+			// yes, it's on purpose: allow the portal to be drawn full-screen and leave the clipping and stuff to the rendered columns buffer
+			return true, newTrapezoid(0, r.screenH, 0, r.screenW, r.screenH, 0)
+		}
+		return false, nil
+	}
+	// TODO: optimize this call (separate projection func?)
+	return r.transformLinedefToScreenArea(l, floorH, ceilingH, c, fitIn)
+}
+
 func (r *PortalsRenderer) transformLinedefToScreenArea(l *linedef, floorH, ceilingH float64, c *camera, fitIn *trapezoid) (bool, *trapezoid) {
 	x1, y1, x2, y2 := c.transformLinedefToCameraSpace(l)
-	// clipping:
+	// culling:
 	if x1 < c.distToScreenPlane && x2 < c.distToScreenPlane {
 		return false, nil
 	}
