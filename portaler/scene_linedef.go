@@ -1,5 +1,7 @@
 package portaler
 
+import "math"
+
 type linedef struct {
 	x1, y1, x2, y2  float64
 	isPortal        bool
@@ -14,6 +16,11 @@ func createLinedef(fx, fy, tx, ty float64) *linedef {
 
 func (l *linedef) setColor(r, g, b uint8) {
 	l.r, l.g, l.b = r, g, b
+}
+
+func (l *linedef) getLength() float64 {
+	normX, normY := l.x2-l.x1, l.y2-l.y1
+	return math.Sqrt(normX*normX + normY*normY)
 }
 
 func createPortalLinedef(fx, fy, tx, ty float64, s1, s2 *sector) *linedef {

@@ -1,9 +1,12 @@
 package portaler
 
-import "math"
+import (
+	"math"
+)
 
 type Scene struct {
-	sectors []*sector
+	sectors  []*sector
+	Textures []Texture
 }
 
 func (s *Scene) addSector(sec *sector) {

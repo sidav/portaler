@@ -15,13 +15,16 @@ var (
 
 func main() {
 	const sw, sh = 1400, 800
-	const pixelSize = 2
+	const pixelSize = 4
 	io = &backend.RaylibBackend{}
 	io.Init(sw, sh)
 	io.SetInternalResolution(sw/pixelSize, sh/pixelSize)
 
 	cam := portaler.NewCamera()
 	scene := &portaler.Scene{}
+	scene.Textures = append(scene.Textures, *portaler.InitTextureFromImageFile("wall.png"))
+	scene.Textures = append(scene.Textures, *portaler.InitTextureFromImageFile("upperwall.png"))
+	scene.Textures = append(scene.Textures, *portaler.InitTextureFromImageFile("lowerwall.png"))
 	scene.InitTesting2()
 
 	renderer := portaler.NewRenderer(io, sw/pixelSize, sh/pixelSize, scene)
