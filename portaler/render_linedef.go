@@ -14,14 +14,13 @@ func (r *PortalsRenderer) renderLinedef(l *linedef, s *sector, c *camera, screen
 }
 
 func (r *PortalsRenderer) renderPortalLinedef(l *linedef, s *sector, c *camera, screenArea *trapezoid) {
-	transformedWall, portalAsWallTrapezoid := r.transformLinedefToScreenArea(l, s.floorHeight, s.ceilingHeight, c, screenArea)
 	transformedPortal, portalTrapezoid := r.transformPortalToScreenArea(l, s.floorHeight, s.ceilingHeight, c, screenArea)
-	if !transformedWall && transformedPortal {
-		r.renderSector(l.getNextSectorFrom(s), c, portalTrapezoid)
+	if !transformedPortal {
 		return
 	}
-	// TODO: investigate if it's needed, or if it should be called earlier.
-	if !transformedPortal {
+	transformedWall, portalAsWallTrapezoid := r.transformLinedefToScreenArea(l, s.floorHeight, s.ceilingHeight, c, screenArea)
+	if !transformedWall {
+		r.renderSector(l.getNextSectorFrom(s), c, portalTrapezoid)
 		return
 	}
 
